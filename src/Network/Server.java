@@ -10,16 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server implements Runnable {
-	ServerSocket serverSocket;
-	List<Socket> socket;
-	List<User> users;
-	BufferedReader readerFromFirstUser;
-	BufferedReader readerFromSecondUser;
-	PrintWriter srvout;
-	boolean serverStatus;
-	Connect conn = new Connect();
+	static ServerSocket serverSocket;
+	static List<Socket> socket;
+	static List<User> users;
+	static BufferedReader readerFromFirstUser;
+	static BufferedReader readerFromSecondUser;
+	static PrintWriter srvout;
+	static boolean serverStatus;
+	static Connect conn = new Connect();
 
 	public Server() {
+		serverStatus = true;
 	}
 
 	public Server(Socket firstUser, Socket secondUser) {
@@ -32,9 +33,10 @@ public class Server implements Runnable {
 		}
 	}
 
-	public void start() throws IOException {
+	public static void start() throws IOException {
 		users = new ArrayList<>();
 		serverSocket = new ServerSocket(conn.getPort());
+		
 		int i = 0;
 		while (i != 2) {
 			Socket usr = null;
@@ -45,8 +47,37 @@ public class Server implements Runnable {
 				i++;
 			}
 		}
-		Thread th = new Thread(new Server(users.get(0).getSocket(), users.get(1).getSocket()));
-		th.run();
+		serverStatus = true;
+		try {
+			readerFromFirstUser = new BufferedReader(new InputStreamReader(users.get(0).getSocket().getInputStream()));
+			readerFromSecondUser = new BufferedReader(new InputStreamReader(users.get(1).getSocket().getInputStream()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String in, out;
+		try {
+			while (serverStatus) {
+
+
+				users.get(0).acceptMsg();
+				in = null;
+
+				if ((in = readerFromFirstUser.readLine() ) != null) 
+					users.get(1).outMsg(in);
+				
+				users.get(1).acceptMsg();
+				in = null;
+				if ((in = readerFromSecondUser.readLine()) != null) 
+					users.get(0).outMsg(in);
+				
+//				if (!in.equals("exit"))
+//					serverStatus = false;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		Thread th = new Thread(new Server(users.get(0).getSocket(), users.get(1).getSocket()));
+//		th.run();
 
 		while (serverStatus) {
 
@@ -72,11 +103,15 @@ public class Server implements Runnable {
 				if (in != null) 
 					users.get(0).outMsg(in);
 				
-				if (!in.equals("exit"))
-					serverStatus = false;
+//				if (!in.equals("exit"))
+//					serverStatus = false;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static ServerSocket getServer() {
+		return serverSocket;
 	}
 }

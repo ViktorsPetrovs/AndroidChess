@@ -6,7 +6,7 @@ import java.net.Socket;
 
 public class Test {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
 //		ServerSocket server = new ServerSocket(8088);
 //		while (true) {
@@ -15,7 +15,6 @@ public class Test {
 //		}
 		Server server = new Server();
 		server.start();
-
-	}
+		}
 
 }
