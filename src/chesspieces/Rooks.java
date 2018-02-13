@@ -7,16 +7,20 @@ public class Rooks extends Piece implements Move {
 		// TODO Auto-generated constructor stub
 	}
 
+//	@Override
+//	public void move(int x, int y) {
+//
+//	}
+
 	@Override
-	public void move() {
+	public void delete() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete() {
-		// TODO Auto-generated method stub
-		
+	public Piece getClone() {
+		return new Rooks(this.getX(), this.getY(), this.isWhite);
 	}
 
 }
