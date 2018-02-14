@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 
-import Logging.Log;
+//import Logging.Log;
 
 public class User {
 	ServerSocket server;

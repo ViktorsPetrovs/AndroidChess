@@ -3,11 +3,13 @@ package Main;
 import chesspieces.*;
 
 public class Board {
-	static int countOfMoves;
+	static int  countOfMoves = 0;
+	
 	public Piece[][] board;
 
 	public Board() {
 		board = new Piece[8][8];
+		int countOfMoves = 0;
 	}
 
 	public Object[][] getBoard() {
@@ -20,25 +22,39 @@ public class Board {
 	}
 	
 	public void clearCoordinates(int x, int y) {
-		board[x][y] = null;
+		this.board[x][y] = null;
 
 	}
 	
 	public void Move(int xStart, int yStart, int xEnd, int yEnd){
-		this.board[xStart][yStart].setX(xEnd);
-		this.board[xStart][yStart].setY(yEnd);
-		this.setCoordinates(xEnd,yEnd,this.board[xStart][yStart]);
+		
+		if (this.board[xStart][yStart]==null){System.out.println("Cell is null with coordinates: "+xStart+","+yStart+","+ xEnd + "," +yEnd);}
+		Piece cell = this.board[xStart][yStart];
+		cell.setX(xEnd);
+		cell.setY(yEnd);
+		this.setCoordinates(xEnd,yEnd,cell);
 		this.clearCoordinates(xStart,yStart);
+		this.countOfMoves++;
+		System.out.println("Move:");
+		System.out.println(TestMethods.coordinatesToLog(xStart,yStart,xEnd,yEnd));
+		
+		History.save(this, xStart, yStart, xEnd, yEnd, cell.toString(), cell.isWhite());
 	}
+	
+	
 	public void Move(int[] array){
 		if(array.length!=4){
 			System.out.println("Problem with moving input");
 		}
-		this.board[array[0]][array[1]].setX(array[2]);
-		this.board[array[0]][array[1]].setY(array[3]);
-		this.setCoordinates(array[2],array[3],this.board[array[0]][array[1]]);
+		Piece cell=this.board[array[0]][array[1]];
+		cell.setX(array[2]);
+		cell.setY(array[3]);
+		this.setCoordinates(array[2],array[3],cell);
 		this.clearCoordinates(array[0],array[1]);
 		this.drawBoard();
+		this.countOfMoves++;
+		//History.save(this);
+		//history.save();
 	}
 
 	public void drawBoard() {
@@ -48,7 +64,7 @@ public class Board {
 				if (this.board[x][y] != null)
 					System.out.print(this.board[x][y].toString() + " ");
 				if (this.board[x][y] == null)
-					System.out.print(" null ");
+					System.out.print("null ");
 			}
 			System.out.println();
 
@@ -69,7 +85,7 @@ public class Board {
 			
 		}
 
-		return board;
+		return cloned;
 	}
 
 }

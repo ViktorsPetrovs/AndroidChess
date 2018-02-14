@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 
-import Logging.Log;
 
 public class Test implements Runnable {
 
@@ -20,8 +19,8 @@ public class Test implements Runnable {
 		// System.out.println("Connection to server accepted! " +
 		// client.getInetAddress());
 		// }
-		Log log = new Log();
-		log.tryLog(Level.FINE, "TEST START");
+		//Log log = new Log();
+		//log.tryLog(Level.FINE, "TEST START");
 		Thread t = new Thread(new Test());
 		t.start();
 		Server server = new Server();
