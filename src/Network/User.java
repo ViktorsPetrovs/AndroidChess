@@ -25,18 +25,16 @@ public class User {
 		}
 	}
 	
-	public void acceptMsg() throws IOException {
-		String str = "@@@@@";
-		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	public String acceptMsg(BufferedReader reader) throws IOException {
+		String str = null;
 		try {
-			str = reader.readLine();
+			while ((str = reader.readLine()) == null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		srvout.println(str);
+		return str;
 	}
 	public void outMsg(String msg) {
-		System.out.println(msg);
 		srvout.println(msg);
 	}
 	public Socket getSocket() {

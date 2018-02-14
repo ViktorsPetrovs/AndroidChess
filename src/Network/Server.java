@@ -34,83 +34,48 @@ public class Server implements Runnable {
 	}
 
 	public static void start() throws IOException {
-		users = new ArrayList<>();
-		serverSocket = new ServerSocket(conn.getPort());
-		
-		int i = 0;
-		while (i != 2) {
-			Socket usr = null;
-			if ((usr = serverSocket.accept()) != null) {
-				System.out.println(usr.toString());
-				User ue = new User(usr);
-				users.add(ue);
-				i++;
-			}
-		}
-		serverStatus = true;
-		try {
-			readerFromFirstUser = new BufferedReader(new InputStreamReader(users.get(0).getSocket().getInputStream()));
-			readerFromSecondUser = new BufferedReader(new InputStreamReader(users.get(1).getSocket().getInputStream()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		String in, out;
-		try {
-			while (serverStatus) {
-
-
-				users.get(0).acceptMsg();
-				in = null;
-
-				if ((in = readerFromFirstUser.readLine() ) != null) 
-					users.get(1).outMsg(in);
-				
-				users.get(1).acceptMsg();
-				in = null;
-				if ((in = readerFromSecondUser.readLine()) != null) 
-					users.get(0).outMsg(in);
-				
-//				if (!in.equals("exit"))
-//					serverStatus = false;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//		Thread th = new Thread(new Server(users.get(0).getSocket(), users.get(1).getSocket()));
-//		th.run();
-
-		while (serverStatus) {
-
-		}
-		serverSocket.close();
-		serverSocket = null;
+		 Thread th = new Thread(new Server());
+		 th.run();
 	}
 
 	@Override
 	public void run() {
-		String in, out;
+		users = new ArrayList<>();
 		try {
-			while (serverStatus) {
+			serverSocket = new ServerSocket(conn.getPort());
 
-
-				users.get(0).acceptMsg();
-				in = readerFromFirstUser.readLine();
-				if (in != null) 
-					users.get(1).outMsg(in);
-				
-				users.get(1).acceptMsg();
-				in = readerFromSecondUser.readLine();
-				if (in != null) 
-					users.get(0).outMsg(in);
-				
-//				if (!in.equals("exit"))
-//					serverStatus = false;
+			int i = 0;
+			while (i != 2) {
+				Socket usr = null;
+				if ((usr = serverSocket.accept()) != null) {
+					System.out.println(usr.toString());
+					User ue = new User(usr);
+					users.add(ue);
+					i++;
+				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			new Server(users.get(0).getSocket(), users.get(1).getSocket());
+			String in, out;
+			try {
+				while (serverStatus) {
+					in = null;
+					in = users.get(0).acceptMsg(readerFromFirstUser);
+					users.get(1).outMsg(in);
+					in = null;
+					in = users.get(1).acceptMsg(readerFromSecondUser);
+					users.get(0).outMsg(in);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			serverSocket.close();
+			serverSocket = null;
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
-	
+
 	public static ServerSocket getServer() {
 		return serverSocket;
 	}
