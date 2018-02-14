@@ -7,10 +7,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Logging.Log;
 
 public class User {
+	private static Logger log = Logger.getLogger(User.class.getName());
 	ServerSocket server;
 	private static int Id = 0;
 	private Socket socket;
@@ -24,8 +26,9 @@ public class User {
 		try {
 			srvout = new PrintWriter(socket.getOutputStream(), true);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, this.getClass().getName() + " User(Socket)", e);		
 		}
+		log.info(socket.toString() + " user added");
 	}
 	
 	public String acceptMsg(BufferedReader reader) throws IOException {
@@ -33,13 +36,14 @@ public class User {
 		try {
 			while ((str = reader.readLine()) == null);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, this.getClass().getName() + " acceptMsg(BufferedReader)", e);
 		}
+		log.info("message accepted VALUE : " + str);
 		return str;
 	}
 	public void outMsg(String msg) {
-//		Log.tryLog(Level.INFO, this.getClass().getSimpleName() + " oustMsg(String msg) : VALUE " + msg);
 		srvout.println(msg);
+		log.info("message sent VALUE : " + msg);
 	}
 	public Socket getSocket() {
 		return socket;

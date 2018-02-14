@@ -7,11 +7,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Logging.Log;
 
 public class Test implements Runnable {
-
+	private static Logger log = Logger.getLogger(Test.class.getName());
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		// ServerSocket server = new ServerSocket(8088);
@@ -20,9 +21,10 @@ public class Test implements Runnable {
 		// System.out.println("Connection to server accepted! " +
 		// client.getInetAddress());
 		// }
-		Log log = new Log();
-		log.tryLog(Level.FINE, "TEST START");
+		new Log();
+		log.info(Test.class.getName() + " started!");
 		Thread t = new Thread(new Test());
+		log.info(t.getName() + " created!");
 		t.start();
 		Server server = new Server();
 		server.start();
@@ -33,7 +35,7 @@ public class Test implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			new Thread().currentThread().sleep(5000);
+			new Thread().currentThread().sleep(1000);
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -42,12 +44,12 @@ public class Test implements Runnable {
 		Socket socket;
 		try {
 			socket = new Socket(conn.getHostname(), conn.getPort());
-
+			log.info(socket.toString() + " connected to server!");
 			PrintWriter srvout = null;
 			try {
 				srvout = new PrintWriter(socket.getOutputStream(), true);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.log(Level.WARNING, srvout.getClass().getName(), e);
 			}
 			String in;
 			String tmp;
@@ -67,8 +69,7 @@ public class Test implements Runnable {
 				System.out.println("--------------------");
 			}
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			log.log(Level.WARNING, Test.class.getName() + " in user method", e1);
 		}
 	}
 }

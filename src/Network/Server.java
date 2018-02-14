@@ -8,8 +8,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server implements Runnable {
+	private static Logger log = Logger.getLogger(Server.class.getName());
 	static ServerSocket serverSocket;
 	static List<User> users;
 	static BufferedReader readerFromFirstUser;
@@ -28,7 +31,7 @@ public class Server implements Runnable {
 			readerFromFirstUser = new BufferedReader(new InputStreamReader(firstUser.getInputStream()));
 			readerFromSecondUser = new BufferedReader(new InputStreamReader(secondUser.getInputStream()));
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, Server.class.getName() + " " + " Server constructor", e);
 		}
 	}
 
@@ -42,7 +45,7 @@ public class Server implements Runnable {
 		users = new ArrayList<>();
 		try {
 			serverSocket = new ServerSocket(conn.getPort());
-
+			log.info(serverSocket.toString() + " server created");
 			int i = 0;
 			while (i != 2) {
 				Socket usr = null;
@@ -79,7 +82,7 @@ public class Server implements Runnable {
 			serverSocket.close();
 			serverSocket = null;
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			log.log(Level.WARNING, Server.class.getName() + " " + " run method", e1);
 		}
 	}
 
