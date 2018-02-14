@@ -11,7 +11,6 @@ import java.util.List;
 
 public class Server implements Runnable {
 	static ServerSocket serverSocket;
-	static List<Socket> socket;
 	static List<User> users;
 	static BufferedReader readerFromFirstUser;
 	static BufferedReader readerFromSecondUser;
@@ -34,8 +33,8 @@ public class Server implements Runnable {
 	}
 
 	public static void start() throws IOException {
-		 Thread th = new Thread(new Server());
-		 th.run();
+		Thread th = new Thread(new Server());
+		th.run();
 	}
 
 	@Override
@@ -55,23 +54,31 @@ public class Server implements Runnable {
 				}
 			}
 			new Server(users.get(0).getSocket(), users.get(1).getSocket());
-			String in, out;
+			String in;
+			int whichUser = 0;
+			int count = 0;
 			try {
 				while (serverStatus) {
-					in = null;
-					in = users.get(0).acceptMsg(readerFromFirstUser);
-					users.get(1).outMsg(in);
-					in = null;
-					in = users.get(1).acceptMsg(readerFromSecondUser);
-					users.get(0).outMsg(in);
+					if (whichUser == 0) {
+						in = null;
+						in = users.get(whichUser).acceptMsg(readerFromFirstUser);
+						users.get(++whichUser).outMsg(in);
+					} else {
+						in = null;
+						in = users.get(whichUser).acceptMsg(readerFromSecondUser);
+						users.get(--whichUser).outMsg(in);
+					}
+					count++;
+					System.out.println(count);
+
 				}
+				System.out.println(count);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			serverSocket.close();
 			serverSocket = null;
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}

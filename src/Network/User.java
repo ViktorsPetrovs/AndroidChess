@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+
+import Logging.Log;
 
 public class User {
 	ServerSocket server;
@@ -35,6 +38,7 @@ public class User {
 		return str;
 	}
 	public void outMsg(String msg) {
+//		Log.tryLog(Level.INFO, this.getClass().getSimpleName() + " oustMsg(String msg) : VALUE " + msg);
 		srvout.println(msg);
 	}
 	public Socket getSocket() {
