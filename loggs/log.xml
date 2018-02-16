@@ -1,28 +1,10 @@
-Feb 14, 2018 3:44:45 PM Network.Test main
+Feb 14, 2018 3:54:49 PM Network.Test main
 INFO: Network.Test started!
-Feb 14, 2018 3:44:46 PM Network.Test main
+Feb 14, 2018 3:54:49 PM Network.Test main
 INFO: Thread-1 created!
-Feb 14, 2018 3:44:46 PM Network.Server run
+Feb 14, 2018 3:54:49 PM Network.Server run
 INFO: ServerSocket[addr=0.0.0.0/0.0.0.0,localport=8088] server created
-Feb 14, 2018 3:44:47 PM Network.Test run
-INFO: Socket[addr=/192.168.8.156,port=8088,localport=39908] connected to server!
-Feb 14, 2018 3:44:47 PM Network.User <init>
-INFO: Socket[addr=/192.168.8.156,port=39908,localport=8088] user added
-Feb 14, 2018 3:44:47 PM Network.User <init>
-INFO: Socket[addr=/192.168.8.153,port=59154,localport=8088] user added
-Feb 14, 2018 3:45:01 PM Network.User acceptMsg
-INFO: message accepted VALUE : 6,4,4,4
-Feb 14, 2018 3:45:01 PM Network.User outMsg
-INFO: message sent VALUE : 6,4,4,4
-Feb 14, 2018 3:45:03 PM Network.User acceptMsg
-INFO: message accepted VALUE : 1,3,3,3
-Feb 14, 2018 3:45:03 PM Network.User outMsg
-INFO: message sent VALUE : 1,3,3,3
-Feb 14, 2018 3:45:06 PM Network.User acceptMsg
-INFO: message accepted VALUE : 4,4,2,4
-Feb 14, 2018 3:45:06 PM Network.User outMsg
-INFO: message sent VALUE : 4,4,2,4
-Feb 14, 2018 3:45:12 PM Network.User acceptMsg
-INFO: message accepted VALUE : 1,41,4,3,4
-Feb 14, 2018 3:45:12 PM Network.User outMsg
-INFO: message sent VALUE : 1,41,4,3,4
+Feb 14, 2018 3:54:50 PM Network.Test run
+INFO: Socket[addr=/192.168.8.156,port=8088,localport=39922] connected to server!
+Feb 14, 2018 3:54:50 PM Network.User <init>
+INFO: Socket[addr=/192.168.8.156,port=39922,localport=8088] user added

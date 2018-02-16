@@ -10,19 +10,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import Logging.Log;
+import Main.*;
 
 public class Test implements Runnable {
 	private static Logger log = Logger.getLogger(Test.class.getName());
 	public static void main(String[] args) throws IOException, InterruptedException {
-		// TODO Auto-generated method stub
-		// ServerSocket server = new ServerSocket(8088);
-		// while (true) {
-		// Socket client = server.accept();
-		// System.out.println("Connection to server accepted! " +
-		// client.getInetAddress());
-		// }
-		new Log();
+//		new Log();
 		log.info(Test.class.getName() + " started!");
+
 		Thread t = new Thread(new Test());
 		log.info(t.getName() + " created!");
 		t.start();
@@ -42,6 +37,7 @@ public class Test implements Runnable {
 		}
 		Connect conn = new Connect();
 		Socket socket;
+		
 		try {
 			socket = new Socket(conn.getHostname(), conn.getPort());
 			log.info(socket.toString() + " connected to server!");
@@ -57,16 +53,21 @@ public class Test implements Runnable {
 			BufferedReader sysR = new BufferedReader(new InputStreamReader(System.in));
 			while (true) {
 				tmp = null;
-				if ((tmp = sysR.readLine()) != null)
+				if ((tmp = sysR.readLine()) != null) {
+//					playingBoard.board.Move(IO.decodeString(tmp));
 					srvout.println(tmp);
-				System.out.println(tmp);
-				System.out.println("--------------------");
+						
+				}
+//				System.out.println(tmp);
+//				System.out.println("--------------------");
 				in = null;
-				if ((in = r.readLine()) != null)
-
-					// IO.decodeString(in);
-					System.out.println(in);
-				System.out.println("--------------------");
+//				if ((in = r.readLine()) != null) 
+//					playingBoard.board.Move(IO.decodeString(in));	
+//					 IO.decodeString(in);
+//					 M
+//				}
+//					System.out.println(in);
+//				System.out.println("--------------------");
 			}
 		} catch (IOException e1) {
 			log.log(Level.WARNING, Test.class.getName() + " in user method", e1);

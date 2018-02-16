@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Logging.Log;
+//import Logging.Log;
 
 public class User {
 	private static Logger log = Logger.getLogger(User.class.getName());
