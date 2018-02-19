@@ -9,18 +9,15 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//import Logging.Log;
-
 public class User {
 	private static Logger log = Logger.getLogger(User.class.getName());
 	ServerSocket server;
-	private static int Id = 0;
 	private Socket socket;
 	private PrintWriter srvout;
+	private boolean isWhite;
 	
 	public User(Socket socket) {
 		server = Server.getServer();
-		User.Id += 1;
 		this.socket = socket;
 		System.out.println("UserConnected!");
 		try {
@@ -31,7 +28,7 @@ public class User {
 		log.info(socket.toString() + " user added");
 	}
 	
-	public String acceptMsg(BufferedReader reader) throws IOException {
+	public String acceptMsgFromUser(BufferedReader reader) throws IOException {
 		String str = null;
 		try {
 			while ((str = reader.readLine()) == null);
@@ -41,7 +38,7 @@ public class User {
 		log.info("message accepted VALUE : " + str);
 		return str;
 	}
-	public void outMsg(String msg) {
+	public void sendMsgToUser(String msg) {
 		srvout.println(msg);
 		log.info("message sent VALUE : " + msg);
 	}
@@ -49,6 +46,12 @@ public class User {
 		return socket;
 	}
 	
+	public void setIsWhite(boolean status) {
+		isWhite = status;
+	}
+	public boolean isWhite() {
+		return isWhite;
+	}
 	public User getUser() {
 		return this;
 	}

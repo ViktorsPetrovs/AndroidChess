@@ -20,6 +20,7 @@ public class Server implements Runnable {
 	static PrintWriter srvout;
 	static boolean serverStatus;
 	static Connect conn = new Connect();
+	static List<User> spectators;
 
 	public Server() {
 		serverStatus = true;
@@ -43,6 +44,7 @@ public class Server implements Runnable {
 	@Override
 	public void run() {
 		users = new ArrayList<>();
+		spectators = new ArrayList<>();
 		try {
 			serverSocket = new ServerSocket(conn.getPort());
 			log.info(serverSocket.toString() + " server created");
@@ -57,6 +59,34 @@ public class Server implements Runnable {
 				}
 			}
 			new Server(users.get(0).getSocket(), users.get(1).getSocket());
+			Thread spectatorsThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+					spectators.add(new User(serverSocket.accept()));
+					} catch (Exception e) {
+						log.log(Level.WARNING, this.getClass().getName() + " Spectators thread alert!");
+					}
+				}
+			});
+			spectatorsThread.start();
+			String chooseColor = "";
+			while (true) {
+				chooseColor = users.get(0).acceptMsgFromUser(readerFromFirstUser);
+				if (chooseColor.equals("b")) {
+					break;
+				} else if (chooseColor.equals("w")){
+					break;
+				}
+				System.out.println("loop" + chooseColor);
+			}
+			if (chooseColor.equals("w")) {
+				users.get(0).setIsWhite(true);
+				users.get(1).setIsWhite(false);
+			} else {
+				users.get(0).setIsWhite(false);
+				users.get(1).setIsWhite(true);
+			}
 			String in;
 			int whichUser = 0;
 			int count = 0;
@@ -64,18 +94,22 @@ public class Server implements Runnable {
 				while (serverStatus) {
 					if (whichUser == 0) {
 						in = null;
-						in = users.get(whichUser).acceptMsg(readerFromFirstUser);
-						users.get(++whichUser).outMsg(in);
+						in = users.get(whichUser).acceptMsgFromUser(readerFromFirstUser);
+						users.get(++whichUser).sendMsgToUser(in);
 					} else {
 						in = null;
-						in = users.get(whichUser).acceptMsg(readerFromSecondUser);
-						users.get(--whichUser).outMsg(in);
+						in = users.get(whichUser).acceptMsgFromUser(readerFromSecondUser);
+						users.get(--whichUser).sendMsgToUser(in);
 					}
 					count++;
-					System.out.println(count);
+					if (spectators.size() > 0) {
+						for (User viewer : spectators) {
+							if (in != null)
+								viewer.sendMsgToUser(in);
+						}
+					}
 
 				}
-				System.out.println(count);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -86,6 +120,9 @@ public class Server implements Runnable {
 		}
 	}
 
+	private void SpectatorAccept() {
+		
+	}
 	public static ServerSocket getServer() {
 		return serverSocket;
 	}
