@@ -71,6 +71,7 @@ public class Server implements Runnable {
 			});
 			spectatorsThread.start();
 			String chooseColor = "";
+			int whichUser = 0;
 			while (true) {
 				chooseColor = users.get(0).acceptMsgFromUser(readerFromFirstUser);
 				if (chooseColor.equals("b")) {
@@ -83,15 +84,18 @@ public class Server implements Runnable {
 			if (chooseColor.equals("w")) {
 				users.get(0).setIsWhite(true);
 				users.get(1).setIsWhite(false);
+				whichUser = 0;
 			} else {
 				users.get(0).setIsWhite(false);
 				users.get(1).setIsWhite(true);
+				whichUser = 1;
+				System.out.println("accepted BBBB");
 			}
 			String in;
-			int whichUser = 0;
 			int count = 0;
 			try {
 				while (serverStatus) {
+					System.out.println("looploopllopppopoo" + " " + whichUser);
 					if (whichUser == 0) {
 						in = null;
 						in = users.get(whichUser).acceptMsgFromUser(readerFromFirstUser);
