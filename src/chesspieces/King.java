@@ -21,5 +21,10 @@ public class King extends Piece implements Move {
 	public Piece getClone() {
 		return new King(this.getX(), this.getY(), this.isWhite);
 	}
+	@Override
+	public String getSign() {
+		if(this.isWhite) return "\u2654";
+		return "\u265A";
+	}
 
 }

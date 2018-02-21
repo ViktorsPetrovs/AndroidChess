@@ -62,18 +62,13 @@ public class History {
 			boolean isWhite = false;
 		
 		public DetailedHistory(int sx, int sy, int ex, int ey, String t, boolean color){
-			this.startX = sx;
-			this.startY = sy;
-			this.endX = ex;
-			this.endY = ey;
+			this.startX = sy;
+			this.startY = sx;
+			this.endX = ey;
+			this.endY = ex;
 			this.isWhite = color;
-			this.type=t;
-			
-			
-			
-		}
-		
-		
+			this.type=t;			
+		}		
 	}
 	
 	public static void save(Board board, int sx, int sy, int ex, int ey, String t, boolean color){

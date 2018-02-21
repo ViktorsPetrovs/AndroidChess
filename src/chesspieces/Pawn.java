@@ -25,4 +25,10 @@ public class Pawn extends Piece implements Move {
 		return new Pawn(this.getX(), this.getY(), this.isWhite);
 	}
 	
+	@Override
+	public String getSign() {
+		if(this.isWhite) return "\u2659";
+		return "\u265F";
+	}
+	
 }

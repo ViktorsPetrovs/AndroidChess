@@ -1,21 +1,11 @@
 package Main;
+import Main.History.DetailedHistory;
 import chesspieces.*; 
 
 public class Logic {
 
 	
 	int peaceExists(int y, int x) {
-
-		/* fill boadr - tmp 
-		Board board = new Board();
-		boolean tmp;
-		for (int i = 0; i<8; i++){
-			tmp = (i>3);
-			for (int j = 0; j<7; j++){
-				board.board[i][j] = new Pawn(i,j,true);
-			}
-		}
-		 end fill board tmp */
 		
 		Board board = new Board();
 		
@@ -28,30 +18,105 @@ public class Logic {
 		return 1;
 	}
 	
-	boolean [][] possibleMoves(int y, int x, Board board) {
+	public boolean [][] possibleMoves(int y, int x, Board board) {
 		boolean [][] result = new boolean [8][8]; 
+		
+		if (board == null) {
+			System.out.println("The bord is null!");
+			return result;
+		}
+		
+		if (board.board[y][x] == null) { 
+			System.out.println("The piece on " + y +"," + x + "is null!");
+			return result;
+		}
+			
 		boolean white = board.board[y][x].isWhite();
 		
-		if (board.board[y][x] instanceof Pawn)
-			result = possiblePawnMoves(y,x,white,board);
-		  
+		if (board.board[y][x] instanceof King)
+			result = possibleKingMoves(y,x,white,board,true);
+		
+		if (board.board[y][x] instanceof Pawn) {
+			if (playerColor() == board.board[y][x].isWhite()) {
+				result = possiblePawnMoves(y,x,white,board,true);
+			}
+			else
+				result = possiblePawnMovesOther(y,x,white,board,true);
+		
+		}
 		if (board.board[y][x] instanceof Knight)
-			result = possibleKnightMoves(y,x,white,board);
+			result = possibleKnightMoves(y,x,white,board,true);
 		
 		if (board.board[y][x] instanceof Bishop)
-			result = possibleBishopMoves(y,x,white,board);
+			result = possibleBishopMoves(y,x,white,board,true);
 		
 		if (board.board[y][x] instanceof Rooks)
-			result = possibleRooksMoves(y,x,white,board);
+			result = possibleRooksMoves(y,x,white,board,true);
 
 		if (board.board[y][x] instanceof Queen)
-			result = possibleQueenMoves(y,x,white,board);
+			result = possibleQueenMoves(y,x,white,board,true);
 
 		return result;
 	}
 	
-	boolean [][] possiblePawnMoves(int y,int x, boolean white, Board board) {
+	boolean [][] possibleKingMoves(int y,int x, boolean white, Board board,boolean toCheckCheh) {
 		boolean [][] result = new boolean [8][8];
+		Board boardTmp;
+		
+		
+		System.out.println("Start !!!!!!From check king -  " + y +","+x);
+	
+		if (y+1 < 8)
+			result[y+1][x] = checkPieceAndWhile(y+1,x,white,board);
+		if (y-1 > -1)
+			result[y-1][x] = checkPieceAndWhile(y-1,x,white,board);
+		if (x+1 < 8)
+			result[y][x+1] = checkPieceAndWhile(y,x+1,white,board);
+		if (x-1 > -1)
+			result[y][x-1] = checkPieceAndWhile(y,x-1,white,board);
+		if ((y + 1 < 8) && (x + 1 < 8))
+			result[y+1][x+1] = checkPieceAndWhile(y+1,x+1,white,board);
+		if ((y + 1 < 8) && (x - 1 > -1))
+			result[y+1][x-1] = checkPieceAndWhile(y+1,x-1,white,board);
+		if ((y-1 > -1) && (x+1 < 8))
+			result[y-1][x+1] = checkPieceAndWhile(y-1,x+1,white,board);
+		if (y-1 > -1 && (x-1 > -1))
+			result[y-1][x-1] = checkPieceAndWhile(y-1,x-1,white,board);
+
+		
+		drawBooleanArray(result,board);
+		System.out.println("From check king -  " + y +","+x);
+		
+		for (int i = 0; i<8; i++){
+			for (int j = 0; j < 8; j++) {
+				if (result[i][j]) {
+					boardTmp = board.clone(board);
+					boardTmp.MoveClone(y, x, i, j);
+					result[i][j] = !isCheck(white,boardTmp);
+				}
+			}
+		}
+		
+		
+		// check Castling
+		
+
+		if (checkCastling(board,white,0,x)) { 
+			result[7][x - 2] = true;
+				
+		}
+		if (checkCastling(board,white,7,x)) {
+			result[7][x + 2] = true;
+		}
+		return result;
+	}
+	
+	
+	
+	boolean [][] possiblePawnMoves(int y,int x, boolean white, Board board, boolean toCheckCheh) {
+		boolean [][] result = new boolean [8][8];
+		Board boardTmp;
+		
 		
 		if ((y > 6) || (y < 1)) {
 			System.out.println("Wrong position for pawn!");
@@ -70,23 +135,142 @@ public class Logic {
 			&& (board.board[y - 1][x - 1] != null) 
 			&& (board.board[y - 1][x - 1].isWhite() != white))
 				result[y - 1][x - 1] = true;
+		//Board boardTmp = board.clone(board);
+//		TestMethods testM = new TestMethods();
 
 		if ((x < 7) 
 				&& (board.board[y - 1][x + 1] != null) 
 				&& (board.board[y - 1][x + 1].isWhite() != white))
 					result[y - 1][x + 1] = true;
-
+		 
 		
+		if (toCheckCheh) {
+			for(int i = 0; i < 8; i++){
+				for (int j = 0; j < 8; j++){
+					if (result[i][j]) {
+						boardTmp = board.clone(board);
+						
+						boardTmp.MoveClone(y, x, i, j);
+						
+//						tmpBool = isCheck(white,boardTmp);
+						result[i][j] = !isCheck(white,boardTmp);
+					}
+				}
+			}
+		}
+
+		 // To check en passant. If function are called
+		// checkCheh - no need.
+		 if ((y == 3) && toCheckCheh) {
+			 History history = new History();
+			 
+			 DetailedHistory detailedHistory = history.getDetailedHistory(board.countOfMoves);
+			 
+			 if (getTypeOfPieceFromString(detailedHistory.getType()) instanceof Pawn) {
+				 if ((detailedHistory.startY == 1) && (detailedHistory.endY == 3)) {
+					 if (detailedHistory.startX == x - 1) {
+							boardTmp = board.clone(board);
+							boardTmp.MoveClone(3, x, 3, x -1);
+							boardTmp.MoveClone(3, x-1, 2, x -1);
+							result[2][x-1] = !isCheck(white,boardTmp);
+					 }
+					 if (detailedHistory.startX == x + 1) {
+							boardTmp = board.clone(board);
+							boardTmp.MoveClone(3, x, 3, x + 1);
+							boardTmp.MoveClone(3, x + 1, 2, x + 1);
+							result[2][x+1] = !isCheck(white,boardTmp);
+					 }
+				 }
+			 }
+			 
+		 }
 		return result;
 	}
 	
+
+	boolean [][] possiblePawnMovesOther(int y,int x, boolean white, Board board, boolean toCheckCheh) {
+		boolean [][] result = new boolean [8][8];
+		Board boardTmp;
+		
+		
+		if ((y < 1) || (y > 6)) {
+			System.out.println("Wrong position for pawn!");
+			return result;
+		}
+			
+		if ((y == 1) 
+			&& (board.board[y + 1][x] == null)
+			&& (board.board[y + 2][x] == null))
+				result[3][x] = true;
+		
+		if (board.board[y + 1][x] == null)
+			result[y+1][x] = true;
+		
+		if ((x > 0) 
+			&& (board.board[y + 1][x - 1] != null) 
+			&& (board.board[y + 1][x - 1].isWhite() != white)) {
+				result[y + 1][x - 1] = true;
+				
+		}
+		//Board boardTmp = board.clone(board);
+//		TestMethods testM = new TestMethods();
+
+		if ((x < 7) 
+				&& (board.board[y + 1][x + 1] != null) 
+				&& (board.board[y + 1][x + 1].isWhite() != white))
+					result[y + 1][x + 1] = true;
+		 
+		
+		if (toCheckCheh) {
+			for(int i = 0; i < 8; i++){
+				for (int j = 0; j < 8; j++){
+					if (result[i][j]) {
+						boardTmp = board.clone(board);
+						
+						boardTmp.MoveClone(y, x, i, j);
+						
+//						tmpBool = isCheck(white,boardTmp);
+						result[i][j] = !isCheck(white,boardTmp);
+					}
+				}
+			}
+		}
+
+		 // To check en passant. If function are called
+		// checkCheh - no need.
+		 if ((y == 3) && toCheckCheh) {
+			 History history = new History();
+			 
+			 DetailedHistory detailedHistory = history.getDetailedHistory(board.countOfMoves);
+			 
+			 if (getTypeOfPieceFromString(detailedHistory.getType()) instanceof Pawn) {
+				 if ((detailedHistory.startY == 1) && (detailedHistory.endY == 3)) {
+					 if (detailedHistory.startX == x - 1) {
+							boardTmp = board.clone(board);
+							boardTmp.MoveClone(3, x, 3, x -1);
+							boardTmp.MoveClone(3, x-1, 2, x -1);
+							result[2][x-1] = !isCheck(white,boardTmp);
+					 }
+					 if (detailedHistory.startX == x + 1) {
+							boardTmp = board.clone(board);
+							boardTmp.MoveClone(3, x, 3, x + 1);
+							boardTmp.MoveClone(3, x + 1, 2, x + 1);
+							result[2][x+1] = !isCheck(white,boardTmp);
+					 }
+				 }
+			 }
+			 
+		 }
+		return result;
+	}
+
 	
-	boolean [][] possibleKnightMoves(int y,int x, boolean white, Board board) {
+	
+	boolean [][] possibleKnightMoves(int y,int x, boolean white, Board board, boolean toCheckCheh) {
 		boolean [][] result = new boolean [8][8];
 		
-		if ((y - 2 > -1) && (x - 1 > -1))
+		if ((y - 2 > -1) && (x - 1 > -1)) 
 			result[y-2][x-1] = checkPieceAndWhile(y-2,x-1,white,board) ;
-
 		if ((y - 2 > -1) && (x + 1 < 8))
 			result[y-2][x+1] = checkPieceAndWhile(y-2,x+1,white,board) ;
 		
@@ -103,17 +287,31 @@ public class Logic {
 			result[y+1][x+2] = checkPieceAndWhile(y+1,x+2,white,board) ;
 		
 		if ((y -1 > -1) && (x + 2 < 8))
-			result[x-1][y+2] = checkPieceAndWhile(x-1,y+2,white,board) ;
+			result[y-1][x+2] = checkPieceAndWhile(y-1,x+2,white,board) ;
 		
 		if ((y -1 > -1) && (x - 2 > -1))
 			result[y-1][x-2] = checkPieceAndWhile(y-1,x-2,white,board) ;
 		
+		if (toCheckCheh) {
+			for(int i = 0; i < 8; i++){
+				for (int j = 0; j < 8; j++){
+					if (result[i][j]) {
+						Board boardTmp = board.clone(board);
+						boardTmp.MoveClone(y, x, i, j);
+//						tmpBool = isCheck(white,boardTmp);
+						result[i][j] = !isCheck(white,boardTmp);
+					}
+				}
+			}
+		}
 		return result;
 	}
 	
 	
-	boolean [][] possibleBishopMoves(int y,int x, boolean white, Board board) {
+	boolean [][] possibleBishopMoves(int y,int x, boolean white, Board board, boolean toCheckCheh) {
 		boolean [][] result = new boolean [8][8];
+		Board boardTmp;
+		boolean tmpBool;
 	
 		int y_start =99, x_start=99, y_step=99, x_step=99, x_marging=99, y_marging=99;
 		for(int i = 1; i < 5; i++){
@@ -140,6 +338,16 @@ public class Logic {
 					break;
 				
 				result[j][x_start] = checkPieceAndWhile(j,x_start,white,board) ;
+			
+				if (result[j][x_start] && toCheckCheh) {
+					boardTmp = board.clone(board);
+					boardTmp.MoveClone(y, x, j, x_start);
+					tmpBool = isCheck(white,boardTmp);
+					result[j][x_start] = !tmpBool;
+//					result[y][i] = result[y][i] && !tmpBool;
+					boardTmp.MoveClone(j, x_start, y, x);	
+				}
+				
 				if (board.board[j][x_start] != null)
 					break;
 				
@@ -150,27 +358,21 @@ public class Logic {
 	}
 	
 	
-	boolean [][] possibleRooksMoves(int y,int x, boolean white, Board board) {
+	boolean [][] possibleRooksMoves(int y,int x, boolean white, Board board,boolean toCheckCheh) {
 		boolean [][] result = new boolean [8][8];
 		Board boardTmp;
-		//Board boardTmp = board.clone(board);
-		
+		boolean tmpBool;
 		
 		for(int i = x -1; i > -1; i --) {
 			result[y][i] = checkPieceAndWhile(y,i,white,board); 
 			
-//			System.out.println("1:  "+y+ "  "+ x+ "  " +y + "  "+ i);
-			if (result[y][i]) { 
+			if (result[y][i] && toCheckCheh) { 
 				boardTmp = board.clone(board);
-				boardTmp.Move(y, x, y, i);
+				boardTmp.MoveClone(y, x, y, i);
+				tmpBool = isCheck(white,boardTmp);
 				
-				System.out.println("=====================================");
-				board.drawBoard();
-				boardTmp.drawBoard();
-				System.out.println("=====================================");
-			
-				result[y][i] = result[y][i] && !isCheck(white,boardTmp);
-				boardTmp.Move(y, i, y, x);
+				result[y][i] = !tmpBool;
+							boardTmp.MoveClone(y, i, y, x);
 			}
 			if (board.board[y][i] != null)
 				break;
@@ -180,29 +382,27 @@ public class Logic {
 		for(int i = x + 1; i < 8; i ++) {
 			result[y][i] = checkPieceAndWhile(y,i,white,board) ;
 			
-//			System.out.println("2:  "+y+ "  "+ x+ "  " +y + "  "+ i);
-			boardTmp = board.clone(board);
-			
-			boardTmp.Move(y, x, y, i);
-			
-	//		result[y][i] = result[y][i] && !isCheck(white,boardTmp);
-			boardTmp.Move(y, i, y, x);
+			if (result[y][i]  && toCheckCheh) {
+				boardTmp = board.clone(board);
+				boardTmp.MoveClone(y, x, y, i);
+				tmpBool = isCheck(white,boardTmp);
+				result[y][i] = !tmpBool;
+				boardTmp.MoveClone(y, i, y, x);
+			}
 			
 			if (board.board[y][i] != null)
 				break;
 		}
 
-//		board.drawBoard();
 		for(int i = y + 1; i < 8; i ++) {
 			result[i][x] = checkPieceAndWhile(i,x,white,board) ;
 			
-//			System.out.println("3:  "+y+ "  "+ x+ "  " +i + "  "+ x);
-
-			if (result[i][x]) {
+			if (result[i][x] && toCheckCheh) {
 				boardTmp = board.clone(board);
-				boardTmp.Move(y, x, i, x);
-//				result[y][i] = result[y][i] && !isCheck(white,boardTmp);
-				boardTmp.Move(i, x, y, x);
+				boardTmp.MoveClone(y, x, i, x);
+				tmpBool = isCheck(white,boardTmp);
+				result[i][x] = !tmpBool;
+				boardTmp.MoveClone(i, x, y, x);
 			}
 
 			if (board.board[i][x] != null)
@@ -211,33 +411,35 @@ public class Logic {
 
 		for(int i = y - 1; i > -1; i --) {
 			
-//			board.drawBoard();
 			result[i][x] = checkPieceAndWhile(i,x,white,board) ;
 			
-//			System.out.println("4:  "+y+ "  "+ x+ "  " +i + "  "+ x);
+			if (result[i][x] && toCheckCheh) {
+	//			System.out.println("1:  "+y+ "  "+ x+ "  " +i + "  "+ x +"    "+ result[i][x]);
+				boardTmp = board.clone(board);
+				boardTmp.MoveClone(y, x, i, x);
+				tmpBool = isCheck(white,boardTmp);
+				result[i][x] = !tmpBool;
+				
+//				System.out.println("1:  "+y+ "  "+ x+ "  " +i + "  "+ x +"    "+tmpBool + "  "+white +"  "+ result[i][x]);
 
-//			board.drawBoard();
-			
-//			if (result[i][x]) {
-//				boardTmp = board.clone(board);
-//				boardTmp.Move(y, x, i, x);
-//				result[i][x] = result[i][x] && !isCheck(white,boardTmp);
-//				boardTmp.Move(i, x, y, x);
-//			}
+				boardTmp.MoveClone(i, x, y, x);
+			}
 			
 			if (board.board[i][x] != null)
 				break;
 		}
-
+              
+//		if (toCheckCheh)
+//		System.out.println("final result 3,4 = "+result[3][4]);
 		return result;
 	}
 
-	boolean [][] possibleQueenMoves(int y,int x, boolean white, Board board) {
+	boolean [][] possibleQueenMoves(int y,int x, boolean white, Board board,boolean toCheckCheh) {
 		boolean [][] result = new boolean [8][8];
 		
 		boolean [][][] results = new boolean [2][8][8]; 
-		results[0] =  possibleRooksMoves(y,x, white, board);
-		results[1] =  possibleBishopMoves(y,x, white, board);
+		results[0] =  possibleRooksMoves(y,x, white, board,toCheckCheh);
+		results[1] =  possibleBishopMoves(y,x, white, board,toCheckCheh);
 
 		result = joinResults(results);
 		
@@ -274,63 +476,96 @@ public class Logic {
 		return result;
 	}		
 	
-	// returns true if there is chsck to while (parameter)
+	// returns true if there is check to while (parameter)
 	boolean isCheck(boolean white, Board board) {
 		
 		boolean [][] result = new boolean [8][8];
+		boolean [][] result1 = new boolean [8][8];
 		boolean [][][] results = new boolean [15][8][8]; 
 		
-		board.drawBoard();
 		
 		int yKing = 99 ,xKing = 99, index =0;
 		
-		System.out.println(white + "   Start!!! " +  board.board[2][4].isWhite());
 		
+		for(int j=0; j < 8; j++) {
+			for(int i=0; i < 8; i++ ) {
+				if ((board.board[j][i] != null)
+						&& (board.board[j][i].isWhite() == white)
+						&& (board.board[j][i] instanceof King)) {
+					yKing = j; xKing = i;
+				}
+			}
+		}	
+		
+		
+		
+		
+//		for(int i=0; i < 8; i++) {
+//			for(int j=0; j < 8; j++ ) {
 		for(int i=0; i < 8; i++) {
 			for(int j=0; j < 8; j++ ) {
 				
-			
-//				for(int i=6; i < 8; i++) {
-//					for(int j=0; j < 8; j++ ) {
-
-//				System.out.println(i + "  " + j + board.board[i][j].toString() + board.board[i][j].isWhite() +"-"+white);
-//				System.out.println(i + "  " + j + "-"+white);
-
 						
-				if (board.board[i][j] == null)
+				if (board.board[j][i] == null)
 					continue;
-				if ((board.board[i][j].isWhite() == white)
-						&& (board.board[i][j] instanceof King)) {
-					yKing = i; xKing = j;
+				if ((board.board[j][i].isWhite() == white)
+						&& (board.board[j][i] instanceof King)) {
+					yKing = j; xKing = i;
+					
 				}
-				else if (board.board[i][j].isWhite() != white) {
+				else if (board.board[j][i].isWhite() != white) {
 					
-					if (board.board[i][j] instanceof Pawn) 
-						result = possiblePawnMoves(i,j,board.board[i][j].isWhite(),board);
-					  
-					if (board.board[i][j] instanceof Knight)
-						result = possibleKnightMoves(i,j,board.board[i][j].isWhite(),board);
+					if (board.board[j][i] instanceof Pawn) { 
+						if (playerColor() == board.board[j][i].isWhite())
+							result = possiblePawnMoves(j,i,board.board[j][i].isWhite(),board,false);
+						else
+							result = possiblePawnMovesOther(j,i,board.board[j][i].isWhite(),board,false);
+						
+//						if ((yKing == 2) && (xKing ==0) && (i==1) && (j==1))
+//							System.out.println("result11="+result[2][0]);
+						
+						
+					}  
+					if (board.board[j][i] instanceof Knight)
+						result = possibleKnightMoves(j,i,board.board[j][i].isWhite(),board,false);
 					
-					if (board.board[i][j] instanceof Bishop)
-						result = possibleBishopMoves(i,j,board.board[i][j].isWhite(),board);
+					if (board.board[j][i] instanceof Bishop)
+						result = possibleBishopMoves(j,i,board.board[j][i].isWhite(),board,false);
 					
-					if (board.board[i][j] instanceof Rooks)
-						result = possibleRooksMoves(i,j,board.board[i][j].isWhite(),board);
+					if (board.board[j][i] instanceof Rooks)
+						result = possibleRooksMoves(j,i,board.board[j][i].isWhite(),board,false);
 
-					if (board.board[i][j] instanceof Queen)
-						result = possibleQueenMoves(i,j,board.board[i][j].isWhite(),board);
-					
-					results[index] = result;
-					
-					
-					index ++;
-					
+					if (board.board[j][i] instanceof Queen) {
+//						result = possibleQueenMoves(i,j,board.board[i][j].isWhite(),board);
+						result = possibleBishopMoves(j,i,board.board[j][i].isWhite(),board,false);
+						result1 = possibleRooksMoves(j,i,board.board[j][i].isWhite(),board,false);
+						
+//						if((i==7) && (j==4)) {
+//						System.out.println(j + "  " + i + "  "+board.board[j][i].toString() +"  "+ board.board[j][i].isWhite() +"-"+white);
+//						System.out.println("rrrrrrrrrrrrrr  " + result1[4][1]);
+//						System.out.println(yKing + ","+ xKing+"   result="+result1[4][1]);
+//						}
+						
+						for(int k=0; k < 8; k++) {
+							for(int n=0; n < 8; n++) {
+								result[k][n] = result[k][n] || result1[k][n];
+								
+							}
+						}
+					}	
+					if (!(board.board[j][i] instanceof King)) {
+						results[index] = result;
+						index ++;
+					}
 				}
-				
-				if((i==2) && (j==4)) {
-					System.out.println(i + "  " + j + board.board[i][j].toString() + board.board[i][j].isWhite() +"-"+white);
-					System.out.println("rrrrrrrrrrrrrr  " + result[5][4]);
-				}	
+//				System.out.println("result="+result[2][0]);
+//				
+//				if((i==1) && (j==1)) {
+//					System.out.println(j + "  " + i + "  "+board.board[j][i].toString() +"  "+ board.board[j][i].isWhite() +"-"+white);
+//					System.out.println("rrrrrrrrrrrrrr  " + result[2][0]);
+//					System.out.println("result="+result[2][0]);
+//
+//				}	
 
 				
 //				System.out.println(i + "  " + j + board.board[i][j].toString());
@@ -341,13 +576,149 @@ public class Logic {
 			}
 		}
 		result = joinResults(results);
-	//	System.out.println("check  " + white + "  " +  yKing + "," +xKing);
-	//	TestMethods testM = new TestMethods();
-	//	testM.drawBooleanArray(result,null);
+//		System.out.println("check  " + white + "  " +  yKing + "," +xKing);
+//		TestMethods testM = new TestMethods();
+//		testM.drawBooleanArray(result,null);
+//		System.out.println("rrrrrrrrrrrrrr  " + result[5][4]);
 		
-		return !result[yKing][xKing];
+		return result[yKing][xKing];
 //		return false;
 	}
+	
+	Piece getTypeOfPieceFromString(String stringType) {
+		
+		Piece piece = null;
+		if (stringType.equals("Pawn"))  piece = new Pawn(-1,-1,true);
+		if (stringType.equals("Bishop")) piece = new Bishop(-1,-1,true);
+		if (stringType.equals("King")) piece = new King(-1,-1,true);
+		if (stringType.equals("Knight")) piece = new Knight(-1,-1,true);
+		if (stringType.equals("Rooks")) piece = new Rooks(-1,-1,true);
+		if (stringType.equals("Queen")) piece = new Queen(-1,-1,true);
+		
+		return piece;
+	}
+	
+	boolean checkCastling(Board board, boolean white, int rooksPosition, int kingPosition) {
+		
+		if ((board.board[7][kingPosition] == null) || (!(board.board[7][kingPosition] instanceof King))
+			&& (board.board[7][rooksPosition] == null) && (!(board.board[7][rooksPosition] instanceof Rooks))) 
+			   return false;
+
+		if ((kingPosition != 3) && (kingPosition != 4))
+			return false;
+		
+		if ((rooksPosition != 0) && (rooksPosition != 0))
+			return false;
+		
+		if (rooksPosition == 0) {
+			for (int i = rooksPosition + 1; i < kingPosition; i++) {
+				if (board.board[7][i] != null)
+					return false;
+			}
+
+			Board boardTmp = board.clone(board);
+			boardTmp.MoveClone(7, kingPosition, 7, kingPosition - 1);
+			if (isCheck(white,boardTmp))
+				return false;
+			
+//			System.out.println("kingPos = "+ kingPosition);
+			boardTmp.MoveClone(7, kingPosition -1, 7, kingPosition - 2);
+			if (isCheck(white,boardTmp))
+				return false;
+			
+		}
+		else
+		{
+			for (int i = rooksPosition - 1; i > kingPosition; i--) {
+				if (board.board[7][i] != null)
+					return false;
+			}
+
+			Board boardTmp = board.clone(board);
+			boardTmp.MoveClone(7, kingPosition, 7, kingPosition + 1);
+			if (isCheck(white,boardTmp))
+				return false;
+			
+			boardTmp.MoveClone(7, kingPosition, 7, kingPosition + 2);
+			if (isCheck(white,boardTmp))
+				return false;
+		}	
+			
+		
+		if (isMoves(board, white, rooksPosition))
+			return false;
+		 
+		return true;
+	}
+	
+	boolean isMoves (Board board,boolean white, int rooksPosition) {
+		 History history = new History();
+		 DetailedHistory detailedHistory;
+		 for(int i = 6; i < board.countOfMoves ; i++) {
+			detailedHistory = history.getDetailedHistory(i);
+			if (detailedHistory.isWhite == white) { 
+				if (getTypeOfPieceFromString(detailedHistory.getType()) instanceof King)
+					return true;
+				if ((getTypeOfPieceFromString(detailedHistory.getType()) instanceof Rooks) &&
+				(detailedHistory.startX == 0))
+					return true;
+			}
+		}
+		
+	return false;	
+	}
+	
+	boolean playerColor() {
+		 History history = new History();
+//		 
+//		 DetailedHistory detailedHistory = history.getDetailedHistory(1);
+//		 
+////		 System.out.println(detailedHistory.startY  + " ---  v nizu - belie!!!!");
+//		 if(detailedHistory == null) return true;
+//		 return (detailedHistory.startY > 5);
+		 return true;
+		 
+	}
+	
+	public int [][] boolResultToInt (boolean boolResult[][]) {
+		int [][] result = new int [64][2];
+		int index = 0;
+		for (int i = 0; i <8; i++) {
+			for (int j = 0; j <8; j++) {
+				if (boolResult[i][j]) {
+					result[index][0] = j;
+					result[index][1] = i;
+					index++;
+				}
+			}
+		}
+		return result;
+	}
+	
+	boolean wasMove(int yStart, int xStart,int yEnd,int xEnd) {
+		boolean result = true;
+		if ((yStart - yEnd) ==0 && (xStart - xEnd ==0))
+			result = false;
+		return result;
+		
+	}
+	
+	
+//---------tmp
+	
+	void drawBooleanArray(boolean[][] test, Board board) {
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+				if (test[x][y] == true)
+					System.out.print(" true ");
+				if (test[x][y] == false)
+					System.out.print(" false");
+			}
+			System.out.println();
+		}
+	}	
+	
+//------------	
 	
 	
 	

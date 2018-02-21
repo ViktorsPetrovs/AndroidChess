@@ -17,10 +17,18 @@ public class Bishop extends Piece implements Move {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 
 	@Override
 	public Piece getClone() {
 		return new Bishop(this.getX(), this.getY(), this.isWhite);
+	}
+
+	@Override
+	public String getSign() {
+		if(this.isWhite) return "\u2657";
+		return "\u265D";
 	}
 
 }

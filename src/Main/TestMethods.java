@@ -8,11 +8,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import Network.IO;
 import chesspieces.*;
+import graphic.Desk;
 
 public class TestMethods {
 	boolean[][] test = new boolean[8][8];
 
-	public void drawBooleanArray(boolean[][] test, Initialization playingBoard) {
+	public void drawBooleanArray(boolean[][] test) {
 		// test = playingBoard.possiblePawnMoves(4, 4, true,
 		// playingBoard.board);
 		for (int x = 0; x < 8; x++) {
@@ -26,24 +27,20 @@ public class TestMethods {
 		}
 	}
 
-	public void parseString(String s) {
-		Board parsed = new Board();
-		int i = 0;
-		if (s.length() != 64) {
-			System.out.println("parsed string not 64 ");
+	
+	public static void singleGame(Board board ) throws IOException{
+		String in=null;
+
+		BufferedReader sysR = new BufferedReader(new InputStreamReader(System.in));
+		while(true)
+		{
+		
+			if ((in = sysR.readLine()) != null){
+				board.Move(IO.decodeString(in));
 		}
-		for (int x = 0; x < 8; x++) {
-			for (int y = 0; y < 8; y++) {// TODO
-				// switch (s.charAt(i))
-				// {
-				// case "W": parsed.board[x][y]=new Pawn(x,y,true);
-				// break;
-				//
-				// }
-				i++;
-			}
-		}
+	    }
 	}
+	
 
 	public static void gameStart(Board board) throws UnknownHostException, IOException {
 
@@ -63,17 +60,19 @@ public class TestMethods {
 		while (true) {
 			tmp=null;
 			in = null;
-			if ((in = r.readLine()) != null){
-				//board.Move(IO.decodeString(in));
-				// IO.decodeString(in);
-				System.out.println(in+" received");
-				System.out.println("--------------------");}
 			if((tmp=sysR.readLine())!=null){
-				
 				srvout.println(tmp);
-
-				//board.Move(IO.decodeString(tmp));
+				System.out.println("Sending: "+tmp);
+				board.Move(IO.decodeString(tmp));
+				//Desk.drawBoardGraphic();
 			}
+			if ((in = r.readLine()) != null){
+				board.Move(IO.decodeString(in));
+				 IO.decodeString(in);
+				System.out.println(in+" received");
+				System.out.println("--------------------");
+				//Desk.drawBoardGraphic();
+				}
 			System.out.println(tmp);
 			System.out.println("--------------------");
 
