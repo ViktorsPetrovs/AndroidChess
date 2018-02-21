@@ -6,11 +6,12 @@ import java.util.logging.Logger;
 
 import Network.Test;
 import chesspieces.*;
+import graphic.Desk;
 
 public class Board {
 	private static Logger log = Logger.getLogger(Board.class.getName());
 	static int  countOfMoves = 0;
-	
+
 	public Piece[][] board;
 
 	public Board() {
@@ -26,28 +27,32 @@ public class Board {
 		board[x][y] = obj;
 
 	}
-	
+
 	public void clearCoordinates(int x, int y) {
 		this.board[x][y] = null;
 
 	}
-	
-	public void Move(int xStart, int yStart, int xEnd, int yEnd){
-		
-		try {
-		if (this.board[xStart][yStart]==null){
-			System.out.println("Cell is null with coordinates: "+xStart+","+yStart+","+ xEnd + "," +yEnd);
+
+	public void Move(int xStart, int yStart, int xEnd, int yEnd) {
+
+		if (this.board[xStart][yStart] == null) {
+			System.out.println("Cell is null with coordinates: " + xStart + "," + yStart + "," + xEnd + "," + yEnd);
+
 		}
 		Piece cell = this.board[xStart][yStart];
 		cell.setX(xEnd);
 		cell.setY(yEnd);
-		this.setCoordinates(xEnd,yEnd,cell);
-		this.clearCoordinates(xStart,yStart);
+//		this.clearCoordinates(xEnd, yEnd);
+//		this.clearCoordinates(xEnd, yEnd);
+		System.out.println(this.board[xEnd][yEnd]);
+		this.setCoordinates(xEnd, yEnd, cell);
+		this.clearCoordinates(xStart, yStart);
 		this.countOfMoves++;
 		System.out.println("Move:");
-		System.out.println(TestMethods.coordinatesToLog(xStart,yStart,xEnd,yEnd));
-		
+		System.out.println(TestMethods.coordinatesToLog(xStart, yStart, xEnd, yEnd));
+		this.drawBoard();
 		History.save(this, xStart, yStart, xEnd, yEnd, cell.toString(), cell.isWhite());
+		try{
 		} catch (Exception e) {
 			log.log(Level.WARNING, Board.class.getName() + " Move(int,int,int,int) ", e);
 		}
@@ -70,12 +75,53 @@ public class Board {
 		this.countOfMoves++;
 		//History.save(this);
 		//history.save();
+
+
+		Desk.drawBoardGraphic();
+	}
+
+	public Board rotate(Board board) {
+		Board rotated = new Board();
+		rotated.board = board.board.clone();
+
+		for (int x = 0; x < 8; x++) {
+
+			for (int y = 0; y < 8; y++) {
+//				if (board.board[7 - x][7 - y] != null)
+//					rotated.board[x][y] = board.board[7 - x][7 - y].getClone();
+//				else rotated.board[x][y]=null;
+			}
+
+		}
+		rotated.drawBoard();
+		return rotated;
+	}
+
+	public void MoveClone(int xStart, int yStart, int xEnd, int yEnd) {
+
+		if (this.board[xStart][yStart] == null) {
+			System.out.println("Cell is null with coordinates: " + xStart + "," + yStart + "," + xEnd + "," + yEnd);
+		}
+		Piece cell = this.board[xStart][yStart];
+		cell.setX(xEnd);
+		cell.setY(yEnd);
+		this.setCoordinates(xEnd, yEnd, cell);
+		this.clearCoordinates(xStart, yStart);
+		// System.out.println("MoveOnClone:");
+		// System.out.println(TestMethods.coordinatesToLog(xStart, yStart, xEnd,
+		// yEnd));
+		// this.drawBoard();
+
+		History.save(this, xStart, yStart, xEnd, yEnd, cell.toString(), cell.isWhite());
 	}
 
 	public void drawBoard() {
 		System.out.println("Starting Draw");
 		String str = "";
+		System.out.println("  A B C D E F G H");
 		for (int x = 0; x < 8; x++) {
+
+			System.out.print(8 - x + " ");
 			for (int y = 0; y < 8; y++) {
 				if (this.board[x][y] != null) {
 					str += this.board[x][y].toString() + " ";}
@@ -87,7 +133,16 @@ public class Board {
 //			System.out.println();
 			str += "\n";
 		}
-		log.info(Board.class.getName() + " drawBoard()\n" + str);
+//		log.info(Board.class.getName() + " drawBoard()\n" + str);
+//				if (this.board[x][y] != null)
+//					System.out.print(this.board[x][y].getSign() + " ");
+//				if (this.board[x][y] == null)
+//					System.out.print("\u25A1 ");
+//			}
+//			System.out.println(8 - x);
+//
+//		}
+		System.out.println("  A B C D E F G H");
 	}
 
 	public Piece[][] parseToFen(String str) {
@@ -211,19 +266,17 @@ public class Board {
 	
 	public Board clone(Board board) {
 		Board cloned = new Board();
-		cloned.countOfMoves= board.countOfMoves;
+		cloned.countOfMoves = board.countOfMoves;
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 
 				if (board.board[x][y] != null) {
 					cloned.board[x][y] = board.board[x][y].getClone();
 				}
-
 			}
-			
 		}
-
 		return cloned;
 	}
+
 
 }

@@ -9,8 +9,11 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import Logging.Log;
 import Main.*;
+import graphic.Desk;
 
 public class Test implements Runnable {
 	private static Logger log = Logger.getLogger(Test.class.getName());
@@ -49,8 +52,19 @@ public class Test implements Runnable {
 			}
 			String in;
 			String tmp;
+			Initialization playingBoard = new Initialization();
+			playingBoard.startingPositions();
 			BufferedReader r = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			BufferedReader sysR = new BufferedReader(new InputStreamReader(System.in));
+			JFrame frame = new Desk();
+			((Desk) frame).initializeBoardInGraphic(playingBoard.board);
+			((Desk) frame).transformToArray();
+			((Desk) frame).drawBoardGraphic(); 
+			frame.pack();
+			frame.setResizable(false);
+			frame.setVisible(true);
+
+			((Desk) frame).drawBoardGraphic();
 			while (true) {
 				tmp = null;
 				if ((tmp = sysR.readLine()) != null) {
