@@ -8,7 +8,7 @@ public class History {
 	
 	static Map<Integer,Board> boardHistory = new HashMap<>();
 	static Map<Integer,DetailedHistory> boardDetailedHistory = new HashMap<>();
-	static class DetailedHistory{
+	public static class DetailedHistory{
 			public int getStartX() {
 			return startX;
 		}

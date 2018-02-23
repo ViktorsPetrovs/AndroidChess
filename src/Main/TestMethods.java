@@ -62,24 +62,17 @@ public class TestMethods {
 			in = null;
 			if ((in = r.readLine()) != null){
 				board.Move(IO.decodeString(in));
-				// IO.decodeString(in);
-				System.out.println(in+" received");
-				System.out.println("--------------------");}
-			if((tmp=sysR.readLine())!=null){
-				srvout.println(tmp);
-
-				board.Move(IO.decodeString(tmp));
-				System.out.println("Sending: "+tmp);
-				board.Move(IO.decodeString(tmp));
-				//Desk.drawBoardGraphic();
-			}
-			if ((in = r.readLine()) != null){
-				board.Move(IO.decodeString(in));
 				 IO.decodeString(in);
 				System.out.println(in+" received");
 				System.out.println("--------------------");
 				//Desk.drawBoardGraphic();
 				}
+			if((tmp=sysR.readLine())!=null){
+				srvout.println(tmp);
+				System.out.println("Sending: "+tmp);
+				board.Move(IO.decodeString(tmp));
+				//Desk.drawBoardGraphic();
+			}
 			System.out.println(tmp);
 			System.out.println("--------------------");
 

@@ -1,16 +1,12 @@
 package Main;
 
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import Network.Test;
 import chesspieces.*;
 import graphic.Desk;
 
 public class Board {
-	private static Logger log = Logger.getLogger(Board.class.getName());
-	static int  countOfMoves = 0;
+	static int countOfMoves = 0;
 
 	public Piece[][] board;
 
@@ -37,13 +33,10 @@ public class Board {
 
 		if (this.board[xStart][yStart] == null) {
 			System.out.println("Cell is null with coordinates: " + xStart + "," + yStart + "," + xEnd + "," + yEnd);
-
 		}
 		Piece cell = this.board[xStart][yStart];
 		cell.setX(xEnd);
 		cell.setY(yEnd);
-//		this.clearCoordinates(xEnd, yEnd);
-//		this.clearCoordinates(xEnd, yEnd);
 		System.out.println(this.board[xEnd][yEnd]);
 		this.setCoordinates(xEnd, yEnd, cell);
 		this.clearCoordinates(xStart, yStart);
@@ -51,33 +44,17 @@ public class Board {
 		System.out.println("Move:");
 		System.out.println(TestMethods.coordinatesToLog(xStart, yStart, xEnd, yEnd));
 		this.drawBoard();
+		if (!(xStart==xEnd && yStart==yEnd))
 		History.save(this, xStart, yStart, xEnd, yEnd, cell.toString(), cell.isWhite());
-		try{
-		} catch (Exception e) {
-			log.log(Level.WARNING, Board.class.getName() + " Move(int,int,int,int) ", e);
-		}
+		
 	}
-	
-	
-	public void Move(int[] array){
-		if(array.length!=4){
-//			System.out.println("Problem with moving input");
-			log.log(Level.WARNING, this.getClass().getName() + " Move(int[])");
+
+	public void Move(int[] array) {
+		if (array.length != 4) {
+			System.out.println("Problem with moving input");
 		}
-		Piece cell=this.board[array[0]][array[1]];
-		cell.setX(array[2]);
-		cell.setY(array[3]);
-		this.setCoordinates(array[2],array[3],cell);
-		this.clearCoordinates(array[0],array[1]);
-		log.info(this.getClass().getName() + " Move(int[]) VALUES : " + array[0] + " " + array[1] +
-				" " + array[2] + " " + array[3]);
-		this.drawBoard();
-		this.countOfMoves++;
-		//History.save(this);
-		//history.save();
+		Move(array[0], array[1], array[2], array[3]);
 
-
-		Desk.drawBoardGraphic();
 	}
 
 	public Board rotate(Board board) {
@@ -87,9 +64,6 @@ public class Board {
 		for (int x = 0; x < 8; x++) {
 
 			for (int y = 0; y < 8; y++) {
-//				if (board.board[7 - x][7 - y] != null)
-//					rotated.board[x][y] = board.board[7 - x][7 - y].getClone();
-//				else rotated.board[x][y]=null;
 			}
 
 		}
@@ -107,47 +81,45 @@ public class Board {
 		cell.setY(yEnd);
 		this.setCoordinates(xEnd, yEnd, cell);
 		this.clearCoordinates(xStart, yStart);
-		// System.out.println("MoveOnClone:");
-		// System.out.println(TestMethods.coordinatesToLog(xStart, yStart, xEnd,
-		// yEnd));
-		// this.drawBoard();
-
+		 this.drawBoard();
 		History.save(this, xStart, yStart, xEnd, yEnd, cell.toString(), cell.isWhite());
 	}
 
 	public void drawBoard() {
 		System.out.println("Starting Draw");
-		String str = "";
 		System.out.println("  A B C D E F G H");
 		for (int x = 0; x < 8; x++) {
 
 			System.out.print(8 - x + " ");
 			for (int y = 0; y < 8; y++) {
-				if (this.board[x][y] != null) {
-					str += this.board[x][y].toString() + " ";}
-				if (this.board[x][y] == null){
-					str += "null ";
-				}
+				if (this.board[x][y] != null)
+					System.out.print(this.board[x][y].getSign() + " ");
+				if (this.board[x][y] == null)
+					System.out.print("\u25A1 ");
 			}
-			
-//			System.out.println();
-			str += "\n";
+			System.out.println(8 - x);
+
 		}
-//		log.info(Board.class.getName() + " drawBoard()\n" + str);
-//				if (this.board[x][y] != null)
-//					System.out.print(this.board[x][y].getSign() + " ");
-//				if (this.board[x][y] == null)
-//					System.out.print("\u25A1 ");
-//			}
-//			System.out.println(8 - x);
-//
-//		}
 		System.out.println("  A B C D E F G H");
 	}
 
-	public Piece[][] parseToFen(String str) {
+	public Board clone(Board board) {
+		Board cloned = new Board();
+		cloned.countOfMoves = board.countOfMoves;
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+
+				if (board.board[x][y] != null) {
+					cloned.board[x][y] = board.board[x][y].getClone();
+				}
+			}
+		}
+		return cloned;
+	}
+
+	public Board parseToFen(String str) {
 		Board fenBoard = new Board();
-		
+
 		StringTokenizer st = new StringTokenizer(str);
 		int x = 0, y = 0;
 		while (st.hasMoreTokens()) {
@@ -157,7 +129,8 @@ public class Board {
 				if (token.substring(0, 1).matches("[1-9]")) {
 					fenBoard.board[x][y] = null;
 					if (Integer.valueOf(token.substring(0, 1)) > 1)
-						token = new String((Integer.valueOf(token.substring(0, 1)) - 1) + token.substring(1, token.length()));
+						token = new String(
+								(Integer.valueOf(token.substring(0, 1)) - 1) + token.substring(1, token.length()));
 					else
 						token = new String(token.substring(1, token.length()));
 				} else if (token.substring(0, 1).equals("b")) {
@@ -196,14 +169,15 @@ public class Board {
 				} else if (token.substring(0, 1).equals("R")) {
 					fenBoard.board[x][y] = new Rooks(x, y, true);
 					token = new String(token.substring(1, token.length()));
-				} 
+				}
 				y++;
 			}
 			x++;
 		}
-		
-		return fenBoard.board;
+
+		return fenBoard;
 	}
+
 	public String parseToFen(Board board) {
 		String str = "";
 		for (int x = 0; x < 8; x++) {
@@ -263,20 +237,5 @@ public class Board {
 		}
 		return str.substring(0, str.length() - 1);
 	}
-	
-	public Board clone(Board board) {
-		Board cloned = new Board();
-		cloned.countOfMoves = board.countOfMoves;
-		for (int x = 0; x < 8; x++) {
-			for (int y = 0; y < 8; y++) {
-
-				if (board.board[x][y] != null) {
-					cloned.board[x][y] = board.board[x][y].getClone();
-				}
-			}
-		}
-		return cloned;
-	}
-
 
 }

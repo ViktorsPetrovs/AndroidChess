@@ -24,6 +24,7 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 	public static int xStart, yStart;
 	public static JPanel[][] squareArray = new JPanel[8][8];
 	public static Board board;
+	public String tmp;
 	TestMethods testM = new TestMethods();
 	public static Container previvous;
 	static String pawnW = "/home/student/workspace/AndroidChess/src/resources/Wpawn.png";
@@ -41,8 +42,7 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 
 	Logic test = new Logic();
 
-	public Desk() throws IOException {
-
+	public Desk() {
 		Dimension boardSize = new Dimension(800, 800);
 
 		layeredPane = new JLayeredPane();
@@ -56,12 +56,7 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 		chessBoard.setLayout(new GridLayout(8, 8));
 		chessBoard.setPreferredSize(boardSize);
 		chessBoard.setBounds(0, 0, boardSize.width, boardSize.height);
-
-		// JPanel piece;
-		// JLabel PawnW = new JLabel(new
-		// ImageIcon("/home/student/workspace/AndroidChess/src/resources/PawnW.png"));
-		// piece.add(PawnW);
-
+		
 		for (int i = 0; i < 64; i++) {
 			JPanel square = new JPanel(new BorderLayout());
 			chessBoard.add(square);
@@ -80,10 +75,6 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 			} else {
 				square.setBackground(Color.white);
 			}
-
-			// System.out.println(chessBoard.size());
-			// square=(JPanel) chessBoard.getComponent(4);
-			// square.add(PawnW);
 
 		}
 
@@ -106,7 +97,9 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 	}
 
 	public static void drawBoardGraphic() {
+		
 		int i = 0;
+		
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				squareArray[x][y].removeAll();
@@ -154,8 +147,6 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 				}
 			}
 		}
-		// boardUpdate();
-		System.out.println("GraphicDone");
 		board.drawBoard();
 
 	}
@@ -187,14 +178,29 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 		testM.drawBooleanArray(test.possibleMoves(x, y, board));
 		s = test.boolResultToInt(test.possibleMoves(x, y, board));
 		int ix = 0;
+		if(!(s==null)){
 		System.out.println(s.length);
-		System.out.println("[" + s[ix][0] + "," + s[ix][1] + "]");
-		while ((s[ix][0]) != 0 || (s[ix][1]) != 0) {
+		//System.out.println("[" + s[ix][0] + "," + s[ix][1] + "]");
+		for (int i = 0; i < s.length; i++) {
 			System.out.println("HighLightLoop entered");
 			System.out.println(s[ix][1]);
 			squareArray[s[ix][1]][s[ix][0]].setBackground(Color.YELLOW);
 			ix++;
 		}
+		}
+		 ix=0;
+		 if(board.board[x][y]!=null){
+		 s=test.boolResultToInt(test.isUnderAttack(test.possibleMoves(x, y,
+		 board),board.board[x][y].isWhite(),board));if(!(s==null)){
+		 System.out.println("PossibleMovesUnderAttackLength: " + s.length);
+		 }
+		 }
+		 if(!(s==null)){
+		 for(int i = 0; i<s.length; i++) {
+		 squareArray[s[ix][1]][s[ix][0]].setBackground(Color.RED);
+		 ix++;
+		 }
+		 }
 	}
 
 	public void HighlightOff() {
@@ -262,24 +268,22 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		boardUpdate();
 		chessPiece = null;
 		int x = -1;
 		int y = -1;
@@ -290,7 +294,6 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 			chessPiece.setLocation(e.getX() - 50, e.getY() - 50);
 			layeredPane.add(chessPiece, JLayeredPane.DRAG_LAYER);
 		}
-		// chessPiece.setSize(chessPiece.getWidth(), chessPiece.getHeight());
 		if (c instanceof JLabel) {
 			previvous = c.getParent();
 			c = c.getParent();
@@ -308,12 +311,11 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 		xStart = x;
 		yStart = y;
 		HighlightOn(y, x);
-
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-
+		
 		if (chessPiece == null)
 			return;
 		chessPiece.setVisible(false);
@@ -344,24 +346,28 @@ public class Desk extends JFrame implements MouseListener, MouseMotionListener {
 			Container parent = (Container) c;
 			parent.add(chessPiece);
 		}
-
 		System.out.println("Move: [" + yStart + "," + xStart + "]-[" + y + "," + x + "]");
 
-		//if (test.possibleMoves(xStart, yStart, board)[x][y]) {
+		testM.drawBooleanArray(test.possibleMoves(yStart, xStart, board));
+		System.out.println("xStart,yStart: " + yStart + xStart);
+		boardUpdate();
+		drawBoardGraphic();
+		if (test.possibleMoves(yStart, xStart, board)[y][x]) {
 			if (board.board[yStart][xStart] != null) {
 				System.out.println("InRElease:" + x + "," + y);
-				if ((yStart - y != 0) || (xStart - x != 0))
+				if ((yStart - y != 0) || (xStart - x != 0)) {
 					board.Move(yStart, xStart, y, x);
+					tmp = (yStart + "," + xStart + "," +y + "," +x);
+					System.out.println(tmp);
+					System.out.println(yStart + "," + xStart + "," +y + "," +x);
+
 			}
-		//}
+		}
+
+			 boardUpdate();
 		HighlightOff();
-
 		drawBoardGraphic();
-		// Container square = chessPiece.getParent();
-		// square.remove(chessPiece);
-		// square.validate();
-		// square.repaint();
-
+		}
 	}
 
 }

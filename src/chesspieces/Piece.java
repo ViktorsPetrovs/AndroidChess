@@ -8,7 +8,6 @@ public abstract class Piece implements Move{
  boolean isAlive;
  
  public Piece(int x, int y, boolean isWhite){
-	 //System.out.print("Object created");
 	 this.x = x;
 	 this.y =y;
 	 this.isWhite=isWhite;

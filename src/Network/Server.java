@@ -52,7 +52,6 @@ public class Server implements Runnable {
 			while (i != 2) {
 				Socket usr = null;
 				if ((usr = serverSocket.accept()) != null) {
-					System.out.println(usr.toString());
 					User ue = new User(usr);
 					users.add(ue);
 					i++;
@@ -72,30 +71,29 @@ public class Server implements Runnable {
 			spectatorsThread.start();
 			String chooseColor = "";
 			int whichUser = 0;
-			while (true) {
-				chooseColor = users.get(0).acceptMsgFromUser(readerFromFirstUser);
-				if (chooseColor.equals("b")) {
-					break;
-				} else if (chooseColor.equals("w")){
-					break;
-				}
-				System.out.println("loop" + chooseColor);
-			}
-			if (chooseColor.equals("w")) {
-				users.get(0).setIsWhite(true);
-				users.get(1).setIsWhite(false);
-				whichUser = 0;
-			} else {
-				users.get(0).setIsWhite(false);
-				users.get(1).setIsWhite(true);
-				whichUser = 1;
-				System.out.println("accepted BBBB");
-			}
-			String in;
+//			while (true) {
+//				chooseColor = users.get(0).acceptMsgFromUser(readerFromFirstUser);
+//				if (chooseColor.equals("b")) {
+//					break;
+//				} else if (chooseColor.equals("w")){
+//					break;
+//				}
+//				System.out.println("loop" + chooseColor);
+//			}
+//			if (chooseColor.equals("w")) {
+//				users.get(0).setIsWhite(true);
+//				users.get(1).setIsWhite(false);
+//				whichUser = 0;
+//			} else {
+//				users.get(0).setIsWhite(false);
+//				users.get(1).setIsWhite(true);
+//				whichUser = 1;
+//				System.out.println("accepted BBBB");
+//			}
+			String in = null;
 			int count = 0;
 			try {
 				while (serverStatus) {
-					System.out.println("looploopllopppopoo" + " " + whichUser);
 					if (whichUser == 0) {
 						in = null;
 						in = users.get(whichUser).acceptMsgFromUser(readerFromFirstUser);
@@ -122,10 +120,6 @@ public class Server implements Runnable {
 		} catch (IOException e1) {
 			log.log(Level.WARNING, Server.class.getName() + " " + " run method", e1);
 		}
-	}
-
-	private void SpectatorAccept() {
-		
 	}
 	public static ServerSocket getServer() {
 		return serverSocket;
